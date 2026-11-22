@@ -1,5 +1,6 @@
-// Caça-palavras simples: palavras são posicionadas em grade 15x15
-const GRID_SIZE = 15;
+// Caça-palavras simples: palavras são posicionadas em grade 18x18
+// (MICROCONTROLADOR tem 16 letras e não cabia na grade 15x15 original)
+const GRID_SIZE = 18;
 
 // Lista de palavras (sem espaços) e suas pistas em português
 const WORDS = [
@@ -36,51 +37,78 @@ function emptyGrid(){
   return g;
 }
 
-// Try to place each word randomly; allow overlaps only when letters match
-function placeWords(words){
-  const grid = emptyGrid();
-  const placed = [];
-  const directions = [
-    {dr:0, dc:1, name:'H'}, // horizontal L->R
-    {dr:1, dc:0, name:'V'}, // vertical T->B
-    {dr:1, dc:1, name:'D'}  // diagonal down-right (optional)
-  ];
+const DIRECTIONS = [
+  {dr:0, dc:1, name:'H'}, // horizontal L->R
+  {dr:1, dc:0, name:'V'}, // vertical T->B
+  {dr:1, dc:1, name:'D'}  // diagonal down-right (optional)
+];
 
-  for(const wobj of words){
-    const word = wobj.word.toUpperCase();
+// CORREÇÃO 1: uma tentativa completa de montar o tabuleiro.
+// - palavras maiores entram primeiro (sobra espaço livre para elas);
+// - a primeira palavra é livre; cada uma das seguintes PRECISA cruzar com
+//   pelo menos uma já colocada, numa direção diferente (cruzamento real);
+// - se alguma palavra não couber, devolve null e o tabuleiro é refeito.
+function tryBuild(words){
+  const grid = emptyGrid();
+  const owners = emptyGrid().map(row => row.map(() => [])); // direções que passam por cada casa
+  const placed = [];
+
+  const ordered = words.slice().sort((a, b) => b.word.length - a.word.length);
+
+  for(let w = 0; w < ordered.length; w++){
+    const word = ordered[w].word.toUpperCase();
     let ok = false;
-    for(let attempt=0; attempt<400 && !ok; attempt++){
-      const dir = directions[Math.floor(Math.random()*directions.length)];
-      const maxR = GRID_SIZE - (dir.dr * (word.length-1)) - 1;
-      const maxC = GRID_SIZE - (dir.dc * (word.length-1)) - 1;
-      const r0 = Math.floor(Math.random()*(maxR+1));
-      const c0 = Math.floor(Math.random()*(maxC+1));
+
+    for(let attempt = 0; attempt < 600 && !ok; attempt++){
+      const dir = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
+      const maxR = GRID_SIZE - (dir.dr * (word.length - 1)) - 1;
+      const maxC = GRID_SIZE - (dir.dc * (word.length - 1)) - 1;
+      if(maxR < 0 || maxC < 0) continue;
+      const r0 = Math.floor(Math.random() * (maxR + 1));
+      const c0 = Math.floor(Math.random() * (maxC + 1));
 
       let fits = true;
+      let crossings = 0;
       const coords = [];
-      for(let i=0;i<word.length;i++){
+      for(let i = 0; i < word.length; i++){
         const r = r0 + dir.dr * i;
         const c = c0 + dir.dc * i;
         const cur = grid[r][c];
-        if(cur === '' || cur === word[i]){
-          coords.push({r,c});
+        if(cur === ''){
+          coords.push({r, c});
+        } else if(cur === word[i] && !owners[r][c].includes(dir.name)){
+          crossings++;            // cruza uma palavra de direção diferente
+          coords.push({r, c});
         } else { fits = false; break; }
       }
       if(!fits) continue;
+      if(w > 0 && crossings === 0) continue; // exige cruzamento (exceto a 1ª palavra)
 
-      // commit
-      for(let i=0;i<word.length;i++){
-        const r = coords[i].r; const c = coords[i].c;
+      for(let i = 0; i < word.length; i++){
+        const {r, c} = coords[i];
         grid[r][c] = word[i];
+        owners[r][c].push(dir.name);
       }
-      placed.push({word, coords, dir:dir.name});
+      placed.push({word, coords, dir: dir.name});
       ok = true;
     }
-    if(!ok){
-      console.warn('Não foi possível posicionar:', wobj.word);
-    }
+    if(!ok) return null;
+  }
+  return {grid, placed};
+}
+
+// Tenta montar o tabuleiro até conseguir colocar TODAS as palavras cruzadas.
+function placeWords(words){
+  let result = null;
+  for(let t = 0; t < 500 && !result; t++){
+    result = tryBuild(words);
+  }
+  if(!result){
+    console.warn('Não foi possível montar o tabuleiro completo.');
+    return {grid: emptyGrid(), placed: []};
   }
 
+  const {grid, placed} = result;
   // fill rest with random letters
   const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   for(let r=0;r<GRID_SIZE;r++){
