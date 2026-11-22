@@ -1,4 +1,4 @@
-// Caça-palavras simples: palavras são posicionadas em grade 18x18
+// Cruzadinha: palavras são posicionadas em grade 18x18 e o tabuleiro é recortado ao tamanho útil
 // (MICROCONTROLADOR tem 16 letras e não cabia na grade 15x15 original)
 const GRID_SIZE = 18;
 
@@ -69,11 +69,23 @@ function tryBuild(words){
       let fits = true;
       let crossings = 0;
       const coords = [];
+
+      // MELHORIA 4: a casa antes e a casa depois da palavra devem estar vazias
+      const rb = r0 - dir.dr, cb = c0 - dir.dc;
+      const ra = r0 + dir.dr * word.length, ca = c0 + dir.dc * word.length;
+      if(rb >= 0 && cb >= 0 && grid[rb][cb] !== '') continue;
+      if(ra < GRID_SIZE && ca < GRID_SIZE && grid[ra][ca] !== '') continue;
+
       for(let i = 0; i < word.length; i++){
         const r = r0 + dir.dr * i;
         const c = c0 + dir.dc * i;
         const cur = grid[r][c];
         if(cur === ''){
+          // casas novas não podem encostar (de lado) em letras de outra palavra
+          const r1 = r + dir.dc, c1 = c + dir.dr;
+          const r2 = r - dir.dc, c2 = c - dir.dr;
+          if((r1 < GRID_SIZE && c1 < GRID_SIZE && grid[r1][c1] !== '') ||
+             (r2 >= 0 && c2 >= 0 && grid[r2][c2] !== '')){ fits = false; break; }
           coords.push({r, c});
         } else if(cur === word[i] && !owners[r][c].includes(dir.name)){
           crossings++;            // cruza uma palavra de direção diferente
@@ -108,13 +120,7 @@ function placeWords(words){
   }
 
   const {grid, placed} = result;
-  // fill rest with random letters
-  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  for(let r=0;r<GRID_SIZE;r++){
-    for(let c=0;c<GRID_SIZE;c++){
-      if(grid[r][c] === '') grid[r][c] = letters[Math.floor(Math.random()*letters.length)];
-    }
-  }
+  // MELHORIA 4: sem letras de enchimento; casas fora das palavras ficam vazias (sem input)
   return {grid, placed};
 }
 
@@ -135,10 +141,27 @@ function assignNumbers(placements){
 
 function renderBoard(){
   boardEl.innerHTML = '';
-  boardEl.style.gridTemplateColumns = `repeat(${GRID_SIZE},34px)`;
-  for(let r=0;r<GRID_SIZE;r++){
-    for(let c=0;c<GRID_SIZE;c++){
+
+  // casas que pertencem a alguma palavra
+  const used = new Set();
+  placements.forEach(p=>p.coords.forEach(({r,c})=>used.add(r+','+c)));
+
+  // recorta a grade ao menor retângulo que contém todas as palavras
+  let minR = GRID_SIZE, maxR = 0, minC = GRID_SIZE, maxC = 0;
+  placements.forEach(p=>p.coords.forEach(({r,c})=>{
+    minR = Math.min(minR, r); maxR = Math.max(maxR, r);
+    minC = Math.min(minC, c); maxC = Math.max(maxC, c);
+  }));
+
+  boardEl.style.gridTemplateColumns = `repeat(${maxC - minC + 1},34px)`;
+  for(let r=minR;r<=maxR;r++){
+    for(let c=minC;c<=maxC;c++){
       const cell = document.createElement('div');
+      if(!used.has(r+','+c)){
+        cell.className = 'block'; // casa vazia, só ocupa espaço
+        boardEl.appendChild(cell);
+        continue;
+      }
       cell.className = 'cell';
       const starting = placements.filter(p=>p.coords[0].r===r && p.coords[0].c===c);
       if(starting.length){
