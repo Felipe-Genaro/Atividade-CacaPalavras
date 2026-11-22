@@ -118,11 +118,35 @@ function placeWords(words){
   return {grid, placed};
 }
 
+// MELHORIA 3: numera as casas iniciais em ordem de leitura (linha, depois coluna).
+// Palavras que começam na mesma casa dividem o mesmo número.
+function assignNumbers(placements){
+  const starts = [];
+  placements.forEach(p=>{
+    const {r,c} = p.coords[0];
+    if(!starts.some(s=>s.r===r && s.c===c)) starts.push({r,c});
+  });
+  starts.sort((a,b)=> a.r-b.r || a.c-b.c);
+  placements.forEach(p=>{
+    const {r,c} = p.coords[0];
+    p.number = starts.findIndex(s=>s.r===r && s.c===c) + 1;
+  });
+}
+
 function renderBoard(){
   boardEl.innerHTML = '';
   boardEl.style.gridTemplateColumns = `repeat(${GRID_SIZE},34px)`;
   for(let r=0;r<GRID_SIZE;r++){
     for(let c=0;c<GRID_SIZE;c++){
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      const starting = placements.filter(p=>p.coords[0].r===r && p.coords[0].c===c);
+      if(starting.length){
+        const num = document.createElement('span');
+        num.className = 'num';
+        num.textContent = starting[0].number;
+        cell.appendChild(num);
+      }
       const input = document.createElement('input');
       input.setAttribute('maxlength','1');
       input.dataset.r = r; input.dataset.c = c;
@@ -131,38 +155,27 @@ function renderBoard(){
       input.addEventListener('input', (e)=>{
         e.target.value = e.target.value.toUpperCase().replace(/[^A-ZÀ-Ÿ]/g,'').slice(0,1);
       });
-      boardEl.appendChild(input);
+      cell.appendChild(input);
+      boardEl.appendChild(cell);
     }
   }
 }
 
 function renderClues(placements){
-  // separate H and V
   hCluesEl.innerHTML = '';
   vCluesEl.innerHTML = '';
-  let hCount=0,vCount=0;
-  placements.forEach((p, idx)=>{
-    const entry = WORDS.find(w=>w.word.toUpperCase()===p.word);
-    const clueText = entry? entry.clue : '';
-    // choose numbering by first coord scanning: if dr==0(horizontal) then horizontal
-    if(p.dir === 'H'){
-      hCount++;
+  placements
+    .map((p, idx)=>({p, idx}))
+    .sort((a,b)=> a.p.number - b.p.number)
+    .forEach(({p, idx})=>{
+      const entry = WORDS.find(w=>w.word.toUpperCase()===p.word);
+      const clueText = entry? entry.clue : '';
       const li = document.createElement('li');
       li.dataset.index = idx;
-      li.textContent = `${hCount}. ${clueText}`;
-      hCluesEl.appendChild(li);
-      p._number = `${hCount}`;
-      p._orientation = 'H';
-    } else {
-      vCount++;
-      const li = document.createElement('li');
-      li.dataset.index = idx;
-      li.textContent = `${vCount}. ${clueText}`;
-      vCluesEl.appendChild(li);
-      p._number = `${vCount}`;
-      p._orientation = 'V';
-    }
-  });
+      li.textContent = `${p.number}. ${clueText}`;
+      (p.dir === 'H' ? hCluesEl : vCluesEl).appendChild(li);
+      p._orientation = p.dir;
+    });
 }
 
 function checkAnswers(){
@@ -205,6 +218,7 @@ function init(){
   const {grid, placed} = placeWords(WORDS);
   solutionGrid = grid;
   placements = placed;
+  assignNumbers(placements);
   renderBoard();
   renderClues(placements);
   counterEl.textContent = `0 de ${placements.length} palavras`;
