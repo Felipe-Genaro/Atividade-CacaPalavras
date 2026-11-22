@@ -26,11 +26,16 @@ h1{text-align:center;margin:8px 0 20px}
 .clues-col{background:rgba(255,255,255,0.03);padding:10px;border-radius:6px;margin-bottom:12px}
 .clues-col ol{list-style:none;padding-left:0;margin:8px 0}
 .clues-col li{margin:6px 0}
-.cell-ok{background:rgba(22,163,74,0.12);border-color:rgba(22,163,74,0.4)}
-.cell-err{background:rgba(220,38,38,0.08);border-color:rgba(220,38,38,0.4)}
 .legend{margin-top:18px;color:var(--muted)}
 
 @media (max-width:900px){
   .game{flex-direction:column}
   .board{transform:scale(0.9);transform-origin:left top}
 }
+
+/* Melhoria 5: marcas nas pistas depois de Conferir */
+.clues-col li.clue-ok{color:#86efac}
+.clues-col li.clue-err{color:#fca5a5}
+.clues-col li .mark{font-weight:700}
+.board input.cell-ok{background:rgba(22,163,74,0.35);border-color:rgba(22,163,74,0.9)}
+.board input.cell-err{background:rgba(220,38,38,0.35);border-color:rgba(220,38,38,0.9)}

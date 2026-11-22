@@ -177,6 +177,7 @@ function renderBoard(){
       input.inputMode = 'text';
       input.addEventListener('input', (e)=>{
         e.target.value = e.target.value.toUpperCase().replace(/[^A-ZÀ-Ÿ]/g,'').slice(0,1);
+        clearFeedbackAt(r, c);
       });
       cell.appendChild(input);
       boardEl.appendChild(cell);
@@ -201,39 +202,94 @@ function renderClues(placements){
     });
 }
 
-function checkAnswers(){
-  const inputs = boardEl.querySelectorAll('input');
-  // clear classes
-  inputs.forEach(i=>{ i.classList.remove('cell-ok','cell-err'); });
+// MELHORIA 5: o Conferir marca cada pista com ✓ (certa) ou ✗ (errada)
+// e só pinta de vermelho as casas que têm letra errada.
+function cellAt(r, c){
+  return boardEl.querySelector(`input[data-r='${r}'][data-c='${c}']`);
+}
 
-  let correctCount = 0;
-  placements.forEach(p=>{
-    const letters = p.coords.map(coord=>{
-      const sel = boardEl.querySelector(`input[data-r='${coord.r}'][data-c='${coord.c}']`);
-      return sel && sel.value ? sel.value.toUpperCase() : '';
-    });
-    const guess = letters.join('');
-    if(guess === p.word){
-      // mark cells ok
-      p.coords.forEach(coord=>{
-        const el = boardEl.querySelector(`input[data-r='${coord.r}'][data-c='${coord.c}']`);
-        el.classList.add('cell-ok');
-      });
-      correctCount++;
-    } else {
-      p.coords.forEach(coord=>{
-        const el = boardEl.querySelector(`input[data-r='${coord.r}'][data-c='${coord.c}']`);
-        el.classList.add('cell-err');
+function setClueMark(idx, state){
+  const li = document.querySelector(`li[data-index='${idx}']`);
+  if(!li) return;
+  li.classList.remove('clue-ok','clue-err');
+  let mark = li.querySelector('.mark');
+  if(!state){ if(mark) mark.remove(); return; }
+  if(!mark){
+    mark = document.createElement('span');
+    mark.className = 'mark';
+    mark.setAttribute('aria-hidden','true');
+    li.appendChild(mark);
+  }
+  li.classList.add(state === 'ok' ? 'clue-ok' : 'clue-err');
+  mark.textContent = state === 'ok' ? ' ✓' : ' ✗';
+}
+
+function updateCounter(){
+  const ok = document.querySelectorAll('.clues li.clue-ok').length;
+  counterEl.textContent = `${ok} de ${placements.length} palavras`;
+}
+
+// Ao editar uma casa, as marcas antigas dela deixam de valer.
+function clearFeedbackAt(r, c){
+  const el = cellAt(r, c);
+  if(el) el.classList.remove('cell-ok','cell-err');
+  placements.forEach((p, idx)=>{
+    if(p.coords.some(k=>k.r===r && k.c===c)){
+      setClueMark(idx, null);
+      p.coords.forEach(k=>{
+        const e = cellAt(k.r, k.c);
+        if(e) e.classList.remove('cell-ok','cell-err');
       });
     }
   });
-  counterEl.textContent = `${correctCount} de ${placements.length} palavras`;
+  updateCounter();
+}
+
+function checkAnswers(){
+  const inputs = boardEl.querySelectorAll('input');
+  inputs.forEach(i=>{ i.classList.remove('cell-ok','cell-err'); });
+
+  const certas = new Set(); // casas que pertencem a alguma palavra correta
+  const status = [];        // 'ok' | 'err' | null (vazia) por palavra
+
+  placements.forEach((p, idx)=>{
+    const letters = p.coords.map(({r,c})=>{
+      const el = cellAt(r, c);
+      return el && el.value ? el.value.toUpperCase() : '';
+    });
+    const guess = letters.join('');
+    const temLetraErrada = letters.some((l, i)=> l && l !== p.word[i]);
+    if(guess === p.word){
+      status[idx] = 'ok';
+      p.coords.forEach(({r,c})=>certas.add(r+','+c));
+    } else if(temLetraErrada){
+      status[idx] = 'err';  // tem pelo menos uma letra errada
+    } else {
+      status[idx] = null;   // vazia ou incompleta (só letras certas até agora): sem marca
+    }
+  });
+
+  // casas: verde nas de palavras certas; vermelho só nas com letra errada
+  placements.forEach((p, idx)=>{
+    p.coords.forEach(({r,c}, i)=>{
+      const el = cellAt(r, c);
+      if(certas.has(r+','+c)){
+        el.classList.add('cell-ok');
+      } else if(status[idx] === 'err' && el.value && el.value.toUpperCase() !== p.word[i]){
+        el.classList.add('cell-err');
+      }
+    });
+    setClueMark(idx, status[idx]);
+  });
+
+  updateCounter();
 }
 
 function restart(){
   const inputs = boardEl.querySelectorAll('input');
   inputs.forEach(i=>{ i.value=''; i.classList.remove('cell-ok','cell-err'); });
-  counterEl.textContent = `0 de ${placements.length} palavras`;
+  placements.forEach((p, idx)=>setClueMark(idx, null));
+  updateCounter();
 }
 
 function init(){
