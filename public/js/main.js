@@ -30,7 +30,7 @@ const restartBtn = document.getElementById('restartBtn');
 const counterEl = document.getElementById('counter');
 
 let solutionGrid = [];
-let placements = []; // {word, coords: [{r,c}], dir: 'H'|'V'|'D'}
+let placements = []; // {word, coords: [{r,c}], dir: 'H'|'V'}
 
 function emptyGrid(){
   const g = new Array(GRID_SIZE).fill(null).map(()=>new Array(GRID_SIZE).fill(''));
@@ -39,9 +39,8 @@ function emptyGrid(){
 
 const DIRECTIONS = [
   {dr:0, dc:1, name:'H'}, // horizontal L->R
-  {dr:1, dc:0, name:'V'}, // vertical T->B
-  {dr:1, dc:1, name:'D'}  // diagonal down-right (optional)
-];
+  {dr:1, dc:0, name:'V'}  // vertical T->B
+];  // CORREÇÃO 2: sem diagonal; só Horizontais e Verticais (regra 2)
 
 // CORREÇÃO 1: uma tentativa completa de montar o tabuleiro.
 // - palavras maiores entram primeiro (sobra espaço livre para elas);
@@ -138,7 +137,7 @@ function renderBoard(){
 }
 
 function renderClues(placements){
-  // separate H and V (and D go to horizontals list as well)
+  // separate H and V
   hCluesEl.innerHTML = '';
   vCluesEl.innerHTML = '';
   let hCount=0,vCount=0;
@@ -146,7 +145,7 @@ function renderClues(placements){
     const entry = WORDS.find(w=>w.word.toUpperCase()===p.word);
     const clueText = entry? entry.clue : '';
     // choose numbering by first coord scanning: if dr==0(horizontal) then horizontal
-    if(p.dir === 'H' || p.dir === 'D'){
+    if(p.dir === 'H'){
       hCount++;
       const li = document.createElement('li');
       li.dataset.index = idx;
