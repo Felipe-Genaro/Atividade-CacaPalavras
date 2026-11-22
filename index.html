@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Caça-Palavras - Arquitetura de Computadores</title>
+  <link rel="stylesheet" href="public/css/style.css" />
+  <style>
+    /* Minimal in-file fallback */
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>Caça-Palavras: Termos de Arquitetura</h1>
+    <section class="game">
+      <div class="board-wrapper">
+        <div id="board" class="board"></div>
+        <div class="controls">
+          <button id="checkBtn">Conferir</button>
+          <button id="restartBtn">Reiniciar</button>
+          <div id="counter">0 de 0 palavras</div>
+        </div>
+      </div>
+      <aside class="clues">
+        <h2>Pistas</h2>
+        <div class="clues-col">
+          <h3>Horizontais</h3>
+          <ol id="hClues"></ol>
+        </div>
+        <div class="clues-col">
+          <h3>Verticais</h3>
+          <ol id="vClues"></ol>
+        </div>
+      </aside>
+    </section>
+    <section class="legend">
+      <p>Digite as letras nas casas. Use o botão Conferir para verificar as respostas. Reiniciar limpa o tabuleiro.</p>
+    </section>
+  </main>
+  <script src="public/js/main.js"></script>
+</body>
+</html>
