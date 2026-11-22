@@ -1,41 +1,161 @@
-:root{
-  --bg:#0f1724;
-  --panel:#0b1220;
-  --accent:#06b6d4;
-  --ok:#16a34a;
-  --err:#dc2626;
-  --muted:#94a3b8;
-}
-*{box-sizing:border-box;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial}
-body{margin:0;background:linear-gradient(180deg,#071029 0%, #071724 100%);color:#e6eef6;min-height:100vh;padding:20px}
-.container{max-width:1100px;margin:0 auto}
-h1{text-align:center;margin:8px 0 20px}
-.game{display:flex;gap:20px;align-items:flex-start}
-.board-wrapper{background:var(--panel);padding:16px;border-radius:8px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
-.board{display:grid;grid-template-columns:repeat(18,34px);grid-auto-rows:34px;gap:4px}
-.cell{position:relative;width:34px;height:34px}
-.cell .num{position:absolute;top:1px;left:3px;font-size:10px;font-weight:700;line-height:1;color:var(--accent);pointer-events:none}
-.block{width:34px;height:34px}
-.board input{width:34px;height:34px;text-align:center;font-weight:700;font-size:16px;border-radius:4px;border:1px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.05);color:#e6eef6}
-.board input:focus{outline:2px solid var(--accent);box-shadow:0 0 0 3px rgba(6,182,212,0.08)}
-.controls{margin-top:12px;display:flex;gap:8px;align-items:center}
-.controls button{background:var(--accent);border:none;color:#042023;padding:8px 12px;border-radius:6px;font-weight:600;cursor:pointer}
-.controls button.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
-.clues{flex:1}
-.clues h2{margin-top:0}
-.clues-col{background:rgba(255,255,255,0.03);padding:10px;border-radius:6px;margin-bottom:12px}
-.clues-col ol{list-style:none;padding-left:0;margin:8px 0}
-.clues-col li{margin:6px 0}
-.legend{margin-top:18px;color:var(--muted)}
-
-@media (max-width:900px){
-  .game{flex-direction:column}
-  .board{transform:scale(0.9);transform-origin:left top}
+:root {
+  --fundo: #f3f5fa;
+  --texto: #1e293b;
+  --suave: #64748b;
+  --marca: #0f766e;
+  --marca-escura: #0b5a54;
+  --topo: #0f172a;
+  --borda: #94a3b8;
+  --celula: #ffffff;
+  --palavra: #dbeafe;
+  --foco: #fde68a;
+  --certo: #bbf7d0;
+  --erro: #fecaca;
+  --cel: clamp(22px, calc((100vw - 48px) / 16), 38px);
 }
 
-/* Melhoria 5: marcas nas pistas depois de Conferir */
-.clues-col li.clue-ok{color:#86efac}
-.clues-col li.clue-err{color:#fca5a5}
-.clues-col li .mark{font-weight:700}
-.board input.cell-ok{background:rgba(22,163,74,0.35);border-color:rgba(22,163,74,0.9)}
-.board input.cell-err{background:rgba(220,38,38,0.35);border-color:rgba(220,38,38,0.9)}
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--fundo);
+  color: var(--texto);
+  line-height: 1.45;
+}
+
+/* ---------- Topo ---------- */
+.topo {
+  background: linear-gradient(135deg, #0f172a, #134e4a);
+  color: #f8fafc;
+  padding: 20px 16px;
+}
+.topo-conteudo { max-width: 1200px; margin: 0 auto; }
+.topo h1 { margin: 0; font-size: 2rem; letter-spacing: .5px; }
+.topo h1 span { color: #5eead4; }
+.subtitulo { margin: 2px 0 12px; color: #cbd5e1; }
+
+.como-jogar { max-width: 640px; }
+.como-jogar summary { cursor: pointer; color: #5eead4; font-weight: 600; }
+.como-jogar ol { margin: 8px 0 0; padding-left: 20px; color: #e2e8f0; }
+.como-jogar li { margin-bottom: 4px; }
+kbd {
+  background: #334155; border-radius: 4px; padding: 0 5px;
+  font-size: .85em; border: 1px solid #475569;
+}
+
+/* ---------- Layout ---------- */
+.jogo {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 0 16px;
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(280px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.painel-tabuleiro,
+.painel-pistas {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, .12);
+  padding: 16px;
+}
+
+/* ---------- Barra de controle ---------- */
+.barra {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  align-items: center; justify-content: space-between;
+}
+.contador { margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--marca); }
+.botoes { display: flex; gap: 8px; }
+.btn {
+  font: inherit; font-weight: 600; cursor: pointer;
+  padding: 8px 16px; border-radius: 8px;
+  border: 1px solid var(--borda); background: #fff; color: var(--texto);
+}
+.btn:hover { background: #f1f5f9; }
+.btn.primario { background: var(--marca); border-color: var(--marca); color: #fff; }
+.btn.primario:hover { background: var(--marca-escura); }
+.btn:focus-visible { outline: 3px solid #5eead4; outline-offset: 2px; }
+
+.mensagem { min-height: 1.4em; margin: 8px 0; font-size: .95rem; color: var(--suave); }
+.mensagem.sucesso { color: #166534; font-weight: 700; }
+
+/* ---------- Tabuleiro ---------- */
+.tabuleiro-wrap { overflow-x: auto; padding: 4px 0; }
+.tabuleiro {
+  display: grid;
+  gap: 2px;
+  width: max-content;
+  margin: 0 auto;
+}
+.vazia { width: var(--cel); height: var(--cel); }
+
+.celula {
+  position: relative;
+  width: var(--cel); height: var(--cel);
+  background: var(--celula);
+  border: 1px solid var(--borda);
+  border-radius: 3px;
+}
+.celula input {
+  width: 100%; height: 100%;
+  border: 0; background: transparent;
+  text-align: center;
+  font: 700 calc(var(--cel) * .5) ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  text-transform: uppercase;
+  color: var(--texto);
+  caret-color: transparent;
+  padding: 6px 0 0;
+  cursor: pointer;
+}
+.celula input:focus { outline: none; }
+.celula .num {
+  position: absolute; top: 1px; left: 2px;
+  font-size: calc(var(--cel) * .27);
+  line-height: 1; font-weight: 700; color: var(--suave);
+  pointer-events: none;
+}
+
+.celula.palavra-ativa { background: var(--palavra); }
+.celula.foco { background: var(--foco); border-color: #d97706; }
+.celula.ok { background: var(--certo); border-color: #16a34a; }
+.celula.erro { background: var(--erro); border-color: #dc2626; }
+
+/* ---------- Pistas ---------- */
+.painel-pistas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+.coluna-pistas h2 {
+  margin: 0 0 8px; font-size: 1.05rem;
+  padding-bottom: 6px; border-bottom: 2px solid var(--marca);
+}
+.lista-pistas { list-style: none; margin: 0; padding: 0; }
+.lista-pistas li { margin-bottom: 2px; }
+.pista {
+  width: 100%; text-align: left;
+  display: flex; gap: 8px; align-items: flex-start;
+  font: inherit; font-size: .93rem; color: var(--texto);
+  background: transparent; border: 0; border-radius: 6px;
+  padding: 6px 8px; cursor: pointer;
+}
+.pista:hover { background: #f1f5f9; }
+.pista:focus-visible { outline: 3px solid #5eead4; }
+.pista .n { font-weight: 700; color: var(--marca); min-width: 1.6em; }
+.pista .t { flex: 1; }
+.pista .estado { font-weight: 700; min-width: 1.2em; text-align: center; }
+.pista.ativa { background: var(--palavra); }
+.pista.ok .estado { color: #16a34a; }
+.pista.bad .estado { color: #dc2626; }
+.pista.ok .t { color: #166534; }
+
+.rodape { text-align: center; color: var(--suave); font-size: .85rem; padding: 12px 0 24px; }
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 900px) {
+  .jogo { grid-template-columns: minmax(0, 1fr); }
+}

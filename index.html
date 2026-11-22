@@ -1,42 +1,60 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Caça-Palavras - Arquitetura de Computadores</title>
-  <link rel="stylesheet" href="public/css/style.css" />
-  <style>
-    /* Minimal in-file fallback */
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ArquiCruza – Cruzadinha de Arquitetura de Computadores</title>
+  <link rel="stylesheet" href="public/css/style.css">
 </head>
 <body>
-  <main class="container">
-    <h1>Caça-Palavras: Termos de Arquitetura</h1>
-    <section class="game">
-      <div class="board-wrapper">
-        <div id="board" class="board"></div>
-        <div class="controls">
-          <button id="checkBtn">Conferir</button>
-          <button id="restartBtn">Reiniciar</button>
-          <div id="counter">0 de 0 palavras</div>
+  <header class="topo">
+    <div class="topo-conteudo">
+      <h1>Arqui<span>Cruza</span></h1>
+      <p class="subtitulo">Cruzadinha de Arquitetura de Computadores</p>
+      <details class="como-jogar">
+        <summary>Como jogar</summary>
+        <ol>
+          <li>Leia uma pista na lista de <strong>Horizontais</strong> ou <strong>Verticais</strong>.</li>
+          <li>Clique na pista (ou numa casa do tabuleiro) e digite a resposta, sem espaços.</li>
+          <li>Use as setas do teclado para andar pelas casas. <kbd>Espaço</kbd> ou <kbd>Enter</kbd> troca a direção.</li>
+          <li>Clique em <strong>Conferir</strong> para ver quais palavras estão certas ✓ e quais estão erradas ✗.</li>
+          <li>Use <strong>Reiniciar</strong> para limpar o tabuleiro e começar de novo.</li>
+        </ol>
+      </details>
+    </div>
+  </header>
+
+  <main class="jogo">
+    <section class="painel-tabuleiro" aria-label="Tabuleiro">
+      <div class="barra">
+        <p id="contador" class="contador" aria-live="polite">0 de 0 palavras</p>
+        <div class="botoes">
+          <button id="btn-conferir" class="btn primario" type="button">Conferir</button>
+          <button id="btn-reiniciar" class="btn" type="button">Reiniciar</button>
         </div>
       </div>
-      <aside class="clues">
-        <h2>Pistas</h2>
-        <div class="clues-col">
-          <h3>Horizontais</h3>
-          <ol id="hClues"></ol>
-        </div>
-        <div class="clues-col">
-          <h3>Verticais</h3>
-          <ol id="vClues"></ol>
-        </div>
-      </aside>
+      <p id="mensagem" class="mensagem" role="status"></p>
+      <div class="tabuleiro-wrap">
+        <div id="tabuleiro" class="tabuleiro"></div>
+      </div>
     </section>
-    <section class="legend">
-      <p>Digite as letras nas casas. Use o botão Conferir para verificar as respostas. Reiniciar limpa o tabuleiro.</p>
+
+    <section class="painel-pistas" aria-label="Pistas">
+      <div class="coluna-pistas">
+        <h2>Horizontais</h2>
+        <ol id="pistas-h" class="lista-pistas"></ol>
+      </div>
+      <div class="coluna-pistas">
+        <h2>Verticais</h2>
+        <ol id="pistas-v" class="lista-pistas"></ol>
+      </div>
     </section>
   </main>
-  <script src="public/js/main.js"></script>
+
+  <footer class="rodape">
+    <p>Feito com HTML, CSS e JavaScript puros.</p>
+  </footer>
+
+  <script src="public/js/script.js"></script>
 </body>
 </html>

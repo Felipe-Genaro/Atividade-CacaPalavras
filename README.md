@@ -1,51 +1,102 @@
-# Caça-Palavras: Termos de Arquitetura de Computadores
+# ArquiCruza – Cruzadinha de Arquitetura de Computadores
 
-Este projeto implementa um caça-palavras educativo com termos de arquitetura de computadores, como pedido no arquivo implementacao_Caça_Palavra.md.
+Jogo de cruzadinha feito para quem está no **primeiro semestre** e quer fixar os termos básicos de **arquitetura computacional**. O jogador lê a pista, descobre o termo e digita a resposta direto no tabuleiro.
 
-O jogo foi feito com HTML, CSS e JavaScript puros e está localizado na pasta raiz deste projeto.
+Feito apenas com **HTML, CSS e JavaScript puros** (sem bibliotecas, sem instalação).
 
-Como abrir
+## Como executar
 
-1. Abra o arquivo index.html no seu navegador (AtividadeCaçaPalavra/index.html).
+Abra o arquivo `index.html` (na raiz do projeto) em qualquer navegador moderno. Não precisa de servidor.
 
-Como jogar
+## Estrutura do projeto
 
-- Leia as pistas à direita (separadas entre Horizontais e Verticais).
-- Digite as letras nas casas do tabuleiro para formar as palavras pesquisadas.
-- Clique em "Conferir" para ver quais palavras estão corretas (células em verde) e quais estão erradas (células em vermelho).
-- O contador mostra quantas palavras estão corretas: por exemplo "8 de 16 palavras".
-- Clique em "Reiniciar" para limpar o tabuleiro e tentar novamente.
+```
+ArquiCruza/
+├── index.html
+├── README.md
+└── public/
+    ├── css/style.css
+    └── js/script.js
+```
 
-Palavras usadas e pistas
+## Como jogar
 
-1. CPU — Unidade central que coordena o processamento.
-2. ULA — Parte da CPU que realiza operações aritméticas e lógicas.
-3. UC — Componente que controla a execução de instruções na CPU.
-4. REGISTRADORES — Pequenas unidades de armazenamento dentro da CPU para dados temporários.
-5. RAM — Memória volátil usada para armazenar dados em uso.
-6. ROM — Memória de leitura, não volátil, com instruções fixas.
-7. EEPROM — Memória não volátil que pode ser reprogramada eletricamente.
-8. FLASH — Memória não volátil usada em armazenamento removível e firmware.
-9. CACHE — Memória rápida entre CPU e memória principal para acelerar acesso.
-10. MEMORIADEMASSA — Armazenamento permanente de grandes volumes de dados.
-11. DMA — Mecanismo que permite transferir dados sem usar intensamente a CPU.
-12. ADDRESSBUS — Barramento que transporta endereços de memória.
-13. DATABUS — Barramento que transporta dados entre componentes.
-14. MICROCONTROLADOR — Circuito integrado com CPU, memória e periféricos integrados.
-15. DUALCORE — Processador com duas unidades de execução independentes.
-16. QUADCORE — Processador com quatro unidades de execução independentes.
+1. Leia as pistas nas listas **Horizontais** e **Verticais**. Cada número da lista aparece na casa onde a palavra começa no tabuleiro.
+2. Clique na pista (ou direto numa casa do tabuleiro) e **digite a resposta, sem espaços e sem acentos**. Por exemplo, "address bus" é escrito `ADDRESSBUS`.
+3. O número entre parênteses no fim da pista indica quantas letras a resposta tem.
+4. Clique em **Conferir** para ver o resultado:
+   - ✓ (verde) = palavra certa;
+   - ✗ (vermelho) = palavra com letras erradas ou faltando;
+   - pista sem marca = ainda sem resposta.
+5. O contador mostra quantas palavras já estão certas (por exemplo, `8 de 16 palavras`).
+6. **Reiniciar** limpa o tabuleiro e zera o contador.
 
-Observações de implementação
+### Atalhos de teclado
 
-- O tabuleiro é gerado dinamicamente em uma grade 15x15.
-- As palavras são posicionadas aleatoriamente nas direções horizontal, vertical e diagonal (para permitir cruzamentos legítimos).
-- O jogador deve preencher o tabuleiro manualmente; o jogo não revela letras.
-- As pistas foram escritas para não conterem a resposta explícita.
+| Tecla | Ação |
+| --- | --- |
+| Letras (A–Z) | Preenchem a casa e avançam para a próxima da palavra |
+| Setas | Movem entre as casas |
+| `Espaço` ou `Enter` | Trocam entre horizontal e vertical |
+| `Backspace` / `Delete` | Apagam a letra |
 
-Próximos passos (opcionais)
+Clicar duas vezes na mesma casa também troca a direção.
 
-1. Persistir a posição do usuário (localStorage) para continuar jogo.
-2. Permitir seleção de palavras com mouse em vez de digitar as letras.
-3. Renderizar automaticamente numeração das pistas baseada nas posições iniciais.
+## Regras do jogo
 
-Boa sorte e bons estudos!
+- O tabuleiro tem **16 palavras**, todas cruzadas com pelo menos uma outra.
+- As pistas são numeradas e separadas em Horizontais e Verticais.
+- Cada pista tem no máximo 15 palavras e não contém a resposta, nem parte dela, nem a sigla por extenso.
+
+## Palavras e pistas
+
+### Horizontais
+
+| Nº | Resposta | Pista |
+| --- | --- | --- |
+| 4 | CPU | Cérebro do computador que busca, decodifica e executa as instruções dos programas. |
+| 5 | CACHE | Pequena e muito veloz, guarda dados usados com frequência perto do processador. |
+| 8 | ULA | Bloco do processador que realiza somas, subtrações e comparações lógicas. |
+| 12 | MICROCONTROLADOR | Chip único que reúne processador, memória e periféricos, comum em sistemas embarcados. |
+| 13 | REGISTRADORES | Pequenas memórias internas ao processador, as mais rápidas, que guardam dados em uso imediato. |
+| 15 | DATABUS | Via de mão dupla que transporta o conteúdo trocado entre processador e memória. |
+| 16 | FLASH | Não volátil regravável por blocos, usada em pendrives e cartões SD. |
+
+### Verticais
+
+| Nº | Resposta | Pista |
+| --- | --- | --- |
+| 1 | UC | Emite os sinais que coordenam os demais blocos a cada ciclo de operação. |
+| 2 | QUADCORE | Processador com quatro núcleos de execução no mesmo chip. |
+| 3 | MEMORIADEMASSA | Guarda grandes volumes de arquivos de forma permanente, como HDs e SSDs. |
+| 6 | DUALCORE | Processador com dois núcleos de execução no mesmo chip. |
+| 7 | EEPROM | Não volátil, regravável byte a byte sem retirar o chip da placa. |
+| 9 | ADDRESSBUS | Via de sentido único que informa à memória qual posição será lida ou escrita. |
+| 10 | DMA | Recurso que permite aos periféricos transferirem dados sem ocupar o processador. |
+| 11 | ROM | Guarda, desde a fabricação, o programa de inicialização e não perde dados sem energia. |
+| 14 | RAM | Espaço de trabalho principal, volátil, onde rodam aplicativos e dados em uso. |
+
+### Termos de referência
+
+| Termo | No tabuleiro |
+| --- | --- |
+| CPU | `CPU` |
+| ULA | `ULA` |
+| UC (Unidade de Controle) | `UC` |
+| Registradores | `REGISTRADORES` |
+| RAM | `RAM` |
+| ROM | `ROM` |
+| EEPROM | `EEPROM` |
+| Flash | `FLASH` |
+| Cache | `CACHE` |
+| Memória de massa (armazenamento) | `MEMORIADEMASSA` |
+| DMA | `DMA` |
+| Address bus (barramento de endereço) | `ADDRESSBUS` |
+| Data bus (barramento de dados) | `DATABUS` |
+| Microcontrolador | `MICROCONTROLADOR` |
+| Dual core | `DUALCORE` |
+| Quad core | `QUADCORE` |
+
+## Como editar as palavras
+
+Todas as palavras ficam na lista `PALAVRAS` no início de `public/js/script.js`. Cada item tem a resposta, a linha e a coluna da primeira letra, a direção (`H` ou `V`) e a pista. A numeração das pistas é calculada automaticamente. Se duas palavras se cruzarem numa letra diferente, o jogo avisa no console do navegador.
